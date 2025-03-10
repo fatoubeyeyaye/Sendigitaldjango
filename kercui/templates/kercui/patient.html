@@ -1,0 +1,515 @@
+{% extends "kercui/base.html" %}
+{% block content %}
+<style>
+    body {
+        background: radial-gradient(circle at 50% 0%, 
+        #90EE90 0%, 
+        #90EE90 50%, 
+        #90EE90 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+    }
+
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: radial-gradient(
+            1000px circle at 50% -10%,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 100%
+        );
+        pointer-events: none;
+    }
+    
+    /* Style pour la barre de navigation principale */
+    .main-nav {
+        background-color: #084887;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px;
+        align-items: center;
+    }
+    
+    .main-nav a {
+        color: white;
+        text-decoration: none;
+        margin-left: 15px;
+    }
+    
+    /* Style pour la barre d'outils secondaire */
+    .toolbar {
+        background-color: #a7e9c9;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px;
+        align-items: center;
+    }
+    
+    .toolbar-left {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .search-box {
+        margin-right: 10px;
+    }
+    
+    .search-input {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        width: 200px;
+    }
+
+    .dashboard {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+    }
+   
+    .welcome-message h1 {
+    color: #ff9933;
+}
+
+.welcome-message p {
+    color: #ff9933;
+}
+
+
+    .logout-button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover {
+        background-color: #c82333;
+    }
+
+    /* Nouveau style pour la section espace patient */
+    .patient-space {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .patient-space h2 {
+        color: #333;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #4a90e2;
+        font-size: 24px;
+    }
+   
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+   
+    .service-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+   
+    .service-card:hover {
+        transform: translateY(-5px);
+    }
+   
+    .service-card button {
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+    }
+   
+    .service-card button:hover {
+        background-color: #357abd;
+    }
+
+    .welcome-message {
+    overflow: hidden;
+    width: 100%;
+}
+
+.scrolling-text {
+    white-space: nowrap;
+    animation: scroll-left 15s linear infinite;
+    display: inline-block;
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+/* Styles existants conservés... */
+    
+    /* Nouveau layout pour la page principale */
+    .main-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 30px auto;
+    }
+    
+    /* Style pour le menu vertical */
+    .vertical-menu {
+        width: 250px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 15px;
+        margin-right: 20px;
+    }
+    
+    .vertical-menu .service-card {
+        margin-bottom: 15px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .vertical-menu .service-card:hover {
+        background-color: #f0f7ff;
+        transform: translateX(5px);
+    }
+    
+    .vertical-menu .service-card h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    
+    .vertical-menu .service-card p {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .vertical-menu .service-card button {
+        width: 100%;
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    /* Style pour la zone de contenu */
+    .content-area {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        min-height: 500px;
+    }
+    
+    /* Style pour le chatbot */
+    .chatbot-container {
+        display: none; /* Caché par défaut */
+        height: 100%;
+    }
+    
+    .chatbot-header {
+        background: #4a90e2;
+        color: white;
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chatbot-messages {
+        height: 350px;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f9f9f9;
+        border: 1px solid #eee;
+    }
+    
+    .message {
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        max-width: 80%;
+    }
+    
+    .user-message {
+        background: #e3f2fd;
+        margin-left: auto;
+    }
+    
+    .bot-message {
+        background: #f1f1f1;
+    }
+    
+    .chatbot-input {
+        display: flex;
+        padding: 10px;
+        background: #fff;
+        border-top: 1px solid #eee;
+    }
+    
+    .chatbot-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+    
+    .chatbot-input button {
+        background: #4a90e2;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<!-- Nouvelle barre de navigation principale -->
+<div class="main-nav">
+    <div>Kergui Health</div>
+    <div>
+        <a href="http://127.0.0.1:8000/">🏠 Accueil</a>
+        <a href="{% url 'rdv' %}">📆 Rendez-vous</a>
+        <a href="#">👨‍⚕️ Consulter medecin</a>
+        <a href="#">📁 DME</a>
+        <a href="{% url 'Connexion' %}">Déconnexion 🔴</a>
+    </div>
+</div>
+
+
+<div class="toolbar">
+    <div class="welcome-message">
+        <marquee behavior="scroll" direction="left" scrollamount="5">
+            <h1>Bienvenue, {{ user.first_name }} {{ user.last_name }}</h1>
+            <p>Que souhaitez-vous faire aujourd'hui ?</p>
+        </marquee>
+    </div>
+    <div class="search-box">
+        <input type="text" placeholder="🔍 Rechercher..." class="search-input">
+    </div>
+</div>
+
+<div class="dashboard">
+   
+
+    <div class="patient-space">
+        <center>
+            <h2>Espace Patient</h2>
+        </center>
+       
+<div class="main-container">
+    
+    <div class="vertical-menu">
+        <div class="service-card" onclick="showChatbot()">
+            <h3>💬Chat</h3>
+            <p>Discutez instantanément avec un professionnel de santé</p>
+            <button>Accéder</button>
+        </div>
+        
+        <div class="service-card">
+            <h3>🎥Joindre medecin direct</h3>
+            <p>Commencez une consultation vidéo avec un médecin</p>
+            <a href="{% url 'video_consultation' %}">Démarrer</a>
+        </div>
+        
+        <div class="service-card">
+            <h3>⚠️Detection anomalie</h3>
+            <p>Signalez ou consultez des anomalies médicales</p>
+            <button>Voir</button>
+        </div>
+        
+        <div class="service-card">
+            <h3>🏥Analyse d’Images Médicales</h3>
+            <p>Commencez un Analyse d'Image</p>
+            <button>Démarrer</button>
+        </div>
+    </div>
+    
+    
+    <div class="content-area">
+        
+        <div id="welcome-content">
+            <h1>Bienvenue sur Kergui Health</h1>
+            <p>Sélectionnez une option dans le menu pour commencer.</p>
+        </div>
+        
+       
+<div id="chatbot-container" class="chatbot-container">
+    <div class="chatbot-header">
+        <h3>Assistant Médical</h3>
+        <button onclick="hideChat()">X</button>
+    </div>
+    <div class="chatbot-messages" id="chat-messages">
+        <div class="message bot-message">
+            Bonjour ! Je suis votre assistant de santé. Comment puis-je vous aider aujourd'hui ?
+        </div>
+    </div>
+    <div class="chatbot-input">
+        <input type="text" id="user-input" placeholder="Tapez votre message ici...">
+        <button onclick="sendMessage()">Envoyer</button>
+    </div>
+</div>
+
+<script>
+    const healthChatbot = {
+        "information": [
+            {
+                "tag": "salutations",
+                "questions": [
+                    "Bonjour !",
+                    "Comment vas-tu ?",
+                    "ça va et toi !",
+                    "Salut !",
+                    "Quoi de neuf ?"
+                ],
+                "reponses": [
+                    "Bonjour, tu vas bien ?",
+                    "Salut !",
+                    "Bonjour",
+                    "Tout se passe bien ici",
+                    "Comment je peux vous aider ?",
+                    "Vous portez bien",
+                    "En quoi puis-je être utile pour vous"
+                ]
+            },
+            {
+                "tag": "symptomes",
+                "questions": [
+                    "J'ai mal à la tête",
+                    "J'ai de la fièvre",
+                    "Je tousse beaucoup",
+                    "J'ai des douleurs abdominales",
+                    "Je me sens fatigué"
+                ],
+                "reponses": [
+                    "Depuis combien de temps ressentez-vous ces symptômes ?",
+                    "Avez-vous pris des médicaments pour soulager ces symptômes ?",
+                    "Ces symptômes pourraient nécessiter une consultation médicale. Souhaitez-vous prendre rendez-vous avec un médecin ?",
+                    "Pourriez-vous me donner plus de détails sur vos symptômes pour mieux vous orienter ?"
+                ]
+            },
+            {
+                "tag": "rendez-vous",
+                "questions": [
+                    "Je veux prendre un rendez-vous",
+                    "Comment réserver une consultation ?",
+                    "Je souhaite voir un médecin",
+                    "Disponibilité des médecins"
+                ],
+                "reponses": [
+                    "Pour prendre rendez-vous, vous pouvez cliquer sur l'option 'Joindre médecin direct' dans le menu ou utiliser l'option 'Rendez-vous' dans la barre de navigation.",
+                    "Souhaitez-vous une consultation vidéo immédiate ou planifier un rendez-vous pour plus tard ?",
+                    "Je peux vous aider à trouver un créneau disponible. Quel jour vous conviendrait le mieux ?"
+                ]
+            },
+            {
+                "tag": "urgence",
+                "questions": [
+                    "C'est une urgence",
+                    "J'ai besoin d'aide immédiatement",
+                    "Situation critique",
+                    "Douleur intense"
+                ],
+                "reponses": [
+                    "Si vous êtes face à une urgence médicale, veuillez contacter immédiatement le 15 ou le 112.",
+                    "Pour une assistance médicale immédiate, utilisez l'option 'Joindre médecin direct' dans le menu latéral.",
+                    "Voulez-vous que j'initie une consultation vidéo d'urgence avec un médecin disponible ?"
+                ]
+            }
+        ]
+    };
+
+    function showChatbot() {
+        document.getElementById("welcome-content").style.display = "none";
+        document.getElementById("chatbot-container").style.display = "block";
+    }
+    
+    function hideChat() {
+        document.getElementById("chatbot-container").style.display = "none";
+        document.getElementById("welcome-content").style.display = "block";
+    }
+    
+    function findResponse(userMessage) {
+   
+        const message = userMessage.toLowerCase();
+        
+        // Parcourir les catégories de la base de connaissances
+        for (const category of healthChatbot.information) {
+            for (const question of category.questions) {
+                // Si le message de l'utilisateur contient des mots-clés de la question
+                if (message.includes(question.toLowerCase()) || 
+                    question.toLowerCase().includes(message)) {
+                    // Retourner une réponse aléatoire de cette catégorie
+                    const responses = category.reponses;
+                    return responses[Math.floor(Math.random() * responses.length)];
+                }
+            }
+        }
+        
+        // Réponse par défaut si aucune correspondance n'est trouvée
+        return "Je ne suis pas sûr de comprendre votre demande. Pourriez-vous la reformuler ou choisir parmi ces sujets : symptômes, rendez-vous, urgence ?";
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById("user-input");
+        const message = input.value.trim();
+        
+        if (message) {
+            // Ajouter le message de l'utilisateur
+            const chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += `<div class="message user-message">${message}</div>`;
+            
+            // Vider l'input
+            input.value = "";
+            
+            // Trouver une réponse appropriée
+            const botResponse = findResponse(message);
+            
+            // Simuler un délai de réponse du bot
+            setTimeout(() => {
+                chatMessages.innerHTML += `<div class="message bot-message">${botResponse}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 800);
+            
+            // Scroller vers le bas
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+    
+    // Permettre l'envoi du message avec la touche Entrée
+    document.getElementById("user-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "kercui/base.html" %}
+{% load form_tags %}
+{% load static %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+        <div class="mb-8 text-center">
+            <center>
+                <div>
+                    <img src="{% static 'kercui/images/img9.jpeg' %}" alt="Logo" class="login-logo" style="width: 70px; height: auto;">
+            
+                    </div></center>
+            <h2 class="text-3xl font-bold text-gray-900">Inscription Patient</h2>
+            <p class="mt-2 text-sm text-gray-600">Créez votre compte pour accéder à nos services de santé</p>
+        </div>
+        
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                <!-- Username -->
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Nom d'utilisateur
+                    </label>
+                    <div class="mt-1">
+                        {{ form.username|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.username.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.username.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Prénom -->
+                <div>
+                    <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Prénom
+                    </label>
+                    <div class="mt-1">
+                        {{ form.first_name|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.first_name.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Nom -->
+                <div>
+                    <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Nom
+                    </label>
+                    <div class="mt-1">
+                        {{ form.last_name|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.last_name.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Mot de passe
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password1|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.password1.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.password1.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Password Confirmation -->
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Confirmation du mot de passe
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password2|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.password2.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.password2.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Telephone -->
+                <div>
+                    <label for="{{ form.telephone.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Téléphone
+                    </label>
+                    <div class="mt-1">
+                        {{ form.telephone|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.telephone.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.telephone.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Adresse -->
+                <div>
+                    <label for="{{ form.adresse.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Adresse
+                    </label>
+                    <div class="mt-1">
+                        {{ form.adresse|addclass:"appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    {% if form.adresse.errors %}
+                    <p class="mt-2 text-sm text-red-600">{{ form.adresse.errors }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    S'inscrire
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-600">
+                Déjà inscrit ?
+                <a href="{% url 'Connexion' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                    Connectez-vous
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

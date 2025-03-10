@@ -1,0 +1,27 @@
+<!-- kercui/templates/kercui/base.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KerCui{% endblock %}</title>
+    {% load static %}
+<link rel="stylesheet" href="{% static 'css/healthcare_form.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="p-4 {% if message.tags == 'success' %}bg-green-100 text-green-700{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+    
+</body>
+</html>

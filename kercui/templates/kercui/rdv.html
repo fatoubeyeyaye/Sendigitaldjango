@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- DEBUG: Afficher les utilisateurs disponibles -->
+<!-- <div style="background: #f8f9fa; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd;">
+    <h4>Utilisateurs disponibles (DEBUG):</h4>
+    <ul>
+    {% for user in users %}
+        <li>ID: {{ user.id }} - Email: {{ user.email }}</li>
+    {% empty %}
+        <li>Aucun utilisateur trouvé</li>
+    {% endfor %}
+    </ul>
+</div> -->
+<!-- FIN DEBUG -->
+<div class="container mt-4">
+    <h2 class="form-title">Prendre un rendez-vous</h2>
+    
+    <form method="post" class="appointment-form">
+        {% csrf_token %}
+        
+        <div class="form-group mb-3">
+            <label for="id_patient" class="form-label">Patient</label>
+            <select name="patient" id="id_patient" class="form-select">
+                <option value="">Sélectionnez un patient</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="{{ form.date_heure.id_for_label }}" class="form-label">Date et heure</label>
+            {{ form.date_heure }}
+            {% if form.date_heure.errors %}
+                <div class="text-danger">{{ form.date_heure.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="{{ form.type.id_for_label }}" class="form-label">Type de consultation</label>
+            {{ form.type }}
+            {% if form.type.errors %}
+                <div class="text-danger">{{ form.type.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="{{ form.statut.id_for_label }}" class="form-label">Statut</label>
+            <select name="statut" id="{{ form.statut.id_for_label }}" class="form-select">
+                {% for value, label in STATUT_CHOICES %}
+                    <option value="{{ value }}" {% if form.statut.value == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            {% if form.statut.errors %}
+                <div class="text-danger">{{ form.statut.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Confirmer le rendez-vous</button>
+            <a href="{% url 'medecin' %}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .appointment-form {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .form-title {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: white;
+    }
+    
+    input[type="datetime-local"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+    }
+    
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+    
+    .btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        text-decoration: none;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0069d9;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,397 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kergui Health - Plateforme médicale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #0c4e7a;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+        }
+        .toolbar {
+            background-color: #8fdfc4;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .toolbar-item a {
+    text-decoration: none;
+}
+
+        .toolbar-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .search-box {
+            margin-left: auto;
+        }
+        .hero {
+            position: relative;
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            overflow: hidden;
+        }
+        .hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .welcome-text {
+            position: relative;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+            color: #ff9933;
+            background-color: #0c4e7a;
+            border-radius: 50px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 5;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .content-section {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .service-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+        .form-section {
+            background-color: #f5f5f5;
+            padding: 30px;
+        }
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: grid;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #0c4e7a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .hero-carousel {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+        
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .carousel-slides {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        
+        .carousel-slide img {
+            max-height: 250px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 15px;
+            font-size: 18px;
+            transition: background 0.3s;
+            z-index: 10;
+        }
+        
+        .carousel-button:hover {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        .carousel-button.prev {
+            left: 10px;
+        }
+        
+        .carousel-button.next {
+            right: 10px;
+        }
+        
+        .carousel-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        
+        .dot {
+            height: 12px;
+            width: 12px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .dot.active, .dot:hover {
+            background-color: #0c4e7a;
+        }
+
+        .scrolling-text {
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.scrolling-text p {
+    display: inline-block;
+    animation: scroll-left 20s linear infinite;
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- <div>
+            <img src="{% static 'kercui/images/13.png' %}" alt="Logo" class="login-logo" style="width: 30px; height: auto;">
+    
+            </div> -->
+        <div class="logo">Kergui Health</div>
+        <div class="nav-menu">
+            <a href="#">🏠Accueil</a>
+            <a href="#"> 📆Rendez-vous</a>
+            <a href="#">🩺Consulter medecin</a>
+            <a href="#">🗂️DME</a>
+            <a href="{% url 'Connexion' %}">Connexion👤</a>
+        </div>
+    </div>
+    
+    <div class="toolbar">
+        <div class="toolbar-item" onclick="showChatPage()">
+            <a href="#">💬Chat</a>
+        </div>
+        <div class="toolbar-item" onclick="showDoctorPage()">
+            <a href="#">📡Joindre medecin direct</a>
+        </div>
+        <div class="toolbar-item">
+            <a href="#">⚠️Detection anomalie</a>
+        </div>
+        <div class="search-box">
+            <input type="text" placeholder="🔍Rechercher..." class="search-input">
+        </div>
+    </div>
+    
+  <!-- Remplacer la div welcome-text existante par: -->
+<div class="welcome-text">
+    <div class="scrolling-text">
+        <p>Bienvenue à Kergui Health &nbsp;&nbsp; Welcome to Kergui Health &nbsp;&nbsp; Daalɓe alla diom ci Kergui Health</p>
+    </div>
+</div>
+    
+    <div class="hero-carousel">
+        <div class="carousel-container">
+            <div class="carousel-slides">
+                <div class="carousel-slide active">
+                    <img src="{% static 'kercui/images/img1.avif' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img2.webp' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img3.jpeg' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img4.jpeg' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img5.jpeg' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img6.jpeg' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img7.jpeg' %}" alt="Médecin avec tablette">
+                </div>
+                <div class="carousel-slide">
+                    <img src="{% static 'kercui/images/img8.jpeg' %}" alt="Médecin avec tablette">
+                </div>
+            </div>
+            
+            <button class="carousel-button prev" onclick="moveSlide(-1)">❮</button>
+            <button class="carousel-button next" onclick="moveSlide(1)">❯</button>
+            
+            <div class="carousel-dots">
+                <span class="dot active" onclick="currentSlide(0)"></span>
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+                <span class="dot" onclick="currentSlide(4)"></span>
+                <span class="dot" onclick="currentSlide(5)"></span>
+                <span class="dot" onclick="currentSlide(6)"></span>
+                <span class="dot" onclick="currentSlide(7)"></span>
+            </div>
+        </div>
+    </div>
+
+    <footer style="background-color: #0c4e7a; color: white; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto;">
+            <div>
+                <h3 style="margin-bottom: 10px;">KËRGUI Health</h3>
+                <p style="color: #ccc;">La télémédecine accessible à tous</p>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 10px;">Contact</h3>
+                <p style="color: #ccc;">Email: contact@kergui-health.com</p>
+                <p style="color: #ccc;">Tél: +221 33 888 22 33</p>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 10px;">Liens utiles</h3>
+                <ul style="list-style: none; padding: 0; display: flex; gap: 15px;">
+                    <li><a href="#" style="color: #ccc; text-decoration: none;">À propos</a></li>
+                    <li><a href="#" style="color: #ccc; text-decoration: none;">CGU</a></li>
+                    <li><a href="#" style="color: #ccc; text-decoration: none;">Confidentialité</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>
+<script>
+    let slideIndex = 0;
+    
+    // Initialiser le carrousel
+    document.addEventListener('DOMContentLoaded', () => {
+        showSlides(slideIndex);
+        // Démarrer le défilement automatique
+        setInterval(() => {
+            moveSlide(1);
+        }, 5000); // Changer d'image toutes les 5 secondes
+    });
+    
+    // Fonction pour avancer ou reculer les slides
+    function moveSlide(n) {
+        showSlides(slideIndex += n);
+    }
+    
+    // Fonction pour afficher un slide spécifique
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+    
+    function showSlides(n) {
+        const slides = document.getElementsByClassName("carousel-slide");
+        const dots = document.getElementsByClassName("dot");
+        
+        // Gérer le dépassement des limites
+        if (n >= slides.length) {slideIndex = 0}    
+        if (n < 0) {slideIndex = slides.length - 1}
+        
+        // Cacher tous les slides
+        for (let i = 0; i < slides.length; i++) {
+            slides[i].classList.remove("active");
+            dots[i].classList.remove("active");
+        }
+        
+        // Afficher le slide actif
+        slides[slideIndex].classList.add("active");
+        dots[slideIndex].classList.add("active");
+    }
+</script>

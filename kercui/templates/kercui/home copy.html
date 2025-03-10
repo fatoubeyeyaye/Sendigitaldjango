@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KËRGUI health - Plateforme de Télémédecine</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Bienvenue dans la plateforme KËRGUI health</h1>
+            <div class="space-x-4">
+                <a href="#" class="hover:text-blue-200">Consultations</a>
+                <a href="#" class="hover:text-blue-200">Rendez-vous</a>
+                <a href="{% url 'form_prof' %}" class="hover:text-blue-200">Dossier Médical</a>
+                <a href="{% url 'register' %}" class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50">Se connecter</a>
+
+                <div class="relative inline-block">
+                    <button onclick="toggleDropdown()" class="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50">
+                        Compte
+                    </button>
+                    <div id="dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl">
+                        <a href="{% url 'login' %}" class="block px-4 py-2 text-blue-600 hover:bg-blue-50">
+                            <i class="fas fa-user-circle mr-2"></i>Compte Patient
+                        </a>
+                        <a href="{% url 'login_prof' %}" class="block px-4 py-2 text-blue-600 hover:bg-blue-50">
+                            <i class="fas fa-user-md mr-2"></i>Compte Professionnel
+                        </a>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="bg-white">
+        <div class="container mx-auto px-4 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <center>
+                    <h1 class="text-4xl font-bold text-gray-900 mb-4">Votre santé, notre priorité</h1>
+                    <p class="text-lg text-gray-600 mb-8">Accédez à des consultations médicales à distance avec des professionnels de santé qualifiés.</p>
+                    <!-- <a href="{% url 'register' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 inline-block">Prendre rendez-vous</a> -->
+                </center>
+                </div>
+                <div>
+                    <img src="{{ object.image.url }}" alt="Image" class="rounded-lg shadow-xl"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Nos Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-4">Consultations Vidéo</h3>
+                    <p class="text-gray-600">Consultez votre médecin en direct depuis chez vous.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-4">Dossier Médical</h3>
+                    <p class="text-gray-600">Accédez à votre dossier médical en ligne en toute sécurité.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-4">Assistant IA</h3>
+                    <p class="text-gray-600">Bénéficiez de recommandations personnalisées par notre IA médicale.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">KËRGUI health</h3>
+                    <p class="text-gray-400">La télémédecine accessible à tous</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Contact</h3>
+                    <p class="text-gray-400">Email: contact@kergui-health.com</p>
+                    <p class="text-gray-400">Tél: +221 33 888 22 33</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Liens utiles</h3>
+                    <ul class="text-gray-400">
+                        <li><a href="#" class="hover:text-white">À propos</a></li>
+                        <li><a href="#" class="hover:text-white">CGU</a></li>
+                        <li><a href="#" class="hover:text-white">Confidentialité</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

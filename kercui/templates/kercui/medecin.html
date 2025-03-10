@@ -1,0 +1,604 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KËRGUI health - Tableau de bord Médecin</title>
+    <style>
+        :root {
+            --primary-color: #2a7fff;
+            --secondary-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color:#0c4e7a;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px 20px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo img {
+            width: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .menu {
+            list-style: none;
+        }
+        
+        .menu li {
+            margin-bottom: 5px;
+        }
+        
+        .menu a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu a:hover, .menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h2 {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .notification {
+            margin-right: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification span {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .card-header h3 {
+            color: var(--dark-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-body {
+            color: var(--dark-color);
+        }
+        
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .card-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .appointments, .patient-list {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-header h3 {
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a68ff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-confirmed {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-cancelled {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+        a.action-btn {
+    text-decoration: none;
+}
+
+        
+        .ai-recommandations {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ai-recommandation-item {
+            border-left: 3px solid var(--primary-color);
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+        }
+        
+        .ai-recommandation-item h4 {
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+        
+        .ai-recommandation-item p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 0;
+            }
+            
+            .logo {
+                justify-content: center;
+                padding: 0 5px 20px 5px;
+            }
+            
+            .logo h1 {
+                display: none;
+            }
+            
+            .logo img {
+                margin-right: 0;
+            }
+            
+            .menu a span {
+                display: none;
+            }
+            
+            .menu i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                margin-top: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{% static 'kercui/images/13.png' %}" alt="KËRGUI Logo">
+                <h1>KËRGUI health</h1>
+            </div>
+            
+            <ul class="menu">
+                <li><a href="http://127.0.0.1:8000/" class="active"><i class="fas fa-home"></i> <span>Accueil</span></a></li>
+                <li><a href="{% url 'rdv' %}"><i class="fas fa-calendar-alt"></i> <span>Rendez-vous</span></a></li>
+                <li><a href="#"><i class="fas fa-user-injured"></i> <span>Patients</span></a></li>
+                <li><a href="#"><i class="fas fa-video"></i> <span>Consultations</span></a></li>
+                <li><a href="#"><i class="fas fa-comments"></i> <span>Messagerie</span></a></li>
+                <li><a href="#"><i class="fas fa-brain"></i> <span>IA Médicale</span></a></li>
+                <li><a href="#"><i class="fas fa-folder-open"></i> <span>DME</span></a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> <span>Statistiques</span></a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> <span>Paramètres</span></a></li>
+                <li><a href="{% url 'Connexion' %}"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a></li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2>Tableau de bord d'un professionnel de santé</h2>
+                <div class="user-info">
+                    <div class="notification">
+                        <i class="fas fa-bell"></i>
+                        <span>3</span>
+                    </div>
+                    <!-- <img src="/api/placeholder/40/40" alt="Photo du profil"> -->
+                    <div>
+                        {% if professionnel %}
+                            <strong>Dr. {{ professionnel.prenom }} {{ professionnel.nom }}</strong>
+                        {% else %}
+                            <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Consultations aujourd'hui</h3>
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-value">8</div>
+                        <div class="card-label">4 terminées, 4 à venir</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Patients actifs</h3>
+                        <div class="card-icon" style="background-color: #17a2b8;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-value">{{ patients.count }}</div>
+                        <div class="card-label">+3 cette semaine</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Taux de satisfaction</h3>
+                        <div class="card-icon" style="background-color: #28a745;">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-value">96%</div>
+                        <div class="card-label">Basé sur 38 avis</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Temps moyen</h3>
+                        <div class="card-icon" style="background-color: #ffc107;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-value">24 min</div>
+                        <div class="card-label">Par consultation</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- les rendez-vous -->
+<div class="appointments">
+    <div class="section-header">
+        <h3>Rendez-vous à venir</h3>
+        <a href="{% url 'rdv' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau RDV</a>
+    </div>
+   
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Patient</th>
+                <th>Date & Heure</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rdv in rendezvous %}
+            <tr>
+                <td>{{ rdv.id }}</td>
+                <td>{{ rdv.last_name }} {{ rdv.first_name }}</td>
+                <td>{{ rdv.date_heure|date:"d M Y H:i" }}</td>
+                <td>{{ rdv.type }}</td>
+                <td>{{ rdv.statut }}</td>
+                <td>
+                    {% if rdv.statut == 'confirme' or rdv.statut == 'CONFIRME' %}
+                        <span class="badge bg-success">Confirmé</span>
+                    {% elif rdv.statut == 'en_attente' or rdv.statut == 'EN_ATTENTE' %}
+                        <span class="badge bg-warning">En attente</span>
+                    {% elif rdv.statut == 'annule' or rdv.statut == 'ANNULE' %}
+                        <span class="badge bg-danger">Annulé</span>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ rdv.statut }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'edit_rdv' rdv.id %}" class="btn btn-sm btn-info">Modifier</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Aucun rendez-vous trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+     <!-- Débogage: Afficher toutes les clés de contexte disponibles -->
+     <div class="mt-5">
+        <h4>Variables de contexte disponibles:</h4>
+        <ul>
+            {% for key, value in request.context.items %}
+            <li>{{ key }}: {{ value|truncatechars:100 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <!-- Section de débogage pour voir les données récupérées -->
+    {% if debug_data %}
+    <div class="mt-5">
+        <h4>Données brutes récupérées (débogage):</h4>
+        <pre>{{ debug_data|pprint }}</pre>
+    </div>
+    {% endif %}
+</div>
+            
+            <div class="patient-list">
+                <div class="section-header">
+                    <h3>Patients inscrits</h3>
+                    <button class="btn btn-primary"><i class="fas fa-search"></i> Rechercher</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Email</th>
+                            <th>Date d'inscription</th>
+                            <th>État</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                            <td>{{ patient.email }}</td>
+                            <td>{{ patient.date_joined|date:"d M Y" }}</td>
+                            <td><span class="status status-confirmed">Actif</span></td>
+                            <td>
+                                <button class="action-btn btn-primary"><i class="fas fa-folder-open"></i> Dossier</button>
+                                <button class="action-btn" style="background-color: #17a2b8; color: white;"><i class="fas fa-comments"></i></button>
+                                <button class="action-btn" style="background-color: #28a745; color: white;"><i class="fas fa-calendar-plus"></i></button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun patient inscrit pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endblock %}
+            
+            <div class="ai-recommandations">
+                <div class="section-header">
+                    <h3>Recommandations IA</h3>
+                </div>
+                
+                <div class="ai-recommandation-item">
+                    <h4>Awa Diallo - Analyse des données vitales</h4>
+                    <p>Les relevés de tension artérielle montrent une légère tendance à la hausse. Considérez un ajustement du traitement ou des analyses complémentaires lors de la prochaine consultation.</p>
+                </div>
+                
+                <div class="ai-recommandation-item">
+                    <h4>Suivi post-opératoire de Kane Fatouma</h4>
+                    <p>D'après les symptômes rapportés et les analyses, la guérison progresse normalement. Recommandation de maintenir le traitement actuel.</p>
+                </div>
+                
+                <div class="ai-recommandation-item">
+                    <h4>Rappel - Formation continue</h4>
+                    <p>Nouvelle étude sur le traitement de l'hypertension disponible dans votre espace formation. Dernières recommandations mises à jour le 28 Février 2025.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
