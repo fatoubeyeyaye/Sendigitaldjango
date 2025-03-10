@@ -80,7 +80,7 @@ DATABASES = {
         # 'NAME': BASE_DIR / 'db.sqlite3',
 
          'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'medicale',
+        'NAME': 'sendigital',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
