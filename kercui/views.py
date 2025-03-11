@@ -35,6 +35,7 @@ def Inscription(request):
            
             Connexion(request, user)
             return redirect('home')
+            
     else:
         form = InscriptionForm()
     return render(request, 'kercui/Authentification/Inscription.html', {'form': form})
