@@ -1,6 +1,18 @@
 {% extends "base.html" %}
-{% block content %}
 {% load static %}
+{% load kercui_extras %}
+
+{% block content %}
+
+<!-- Ajoutez cette section au début de votre template pour voir les données brutes -->
+<!-- <div style="margin-top: 20px; padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd;">
+    <h4>Données brutes de kercui_rendezvous:</h4>
+    <pre>{{ debug_data|pprint }}</pre>
+    {% if model_fields %}
+    <h4>Champs du modèle:</h4>
+    <pre>{{ model_fields|pprint }}</pre>
+    {% endif %} -->
+<!-- </div> -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -470,73 +482,102 @@
 
 
             <!-- les rendez-vous -->
-<div class="appointments">
-    <div class="section-header">
-        <h3>Rendez-vous à venir</h3>
-        <a href="{% url 'rdv' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau RDV</a>
-    </div>
-   
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Patient</th>
-                <th>Date & Heure</th>
-                <th>Type</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for rdv in rendezvous %}
-            <tr>
-                <td>{{ rdv.id }}</td>
-                <td>{{ rdv.last_name }} {{ rdv.first_name }}</td>
-                <td>{{ rdv.date_heure|date:"d M Y H:i" }}</td>
-                <td>{{ rdv.type }}</td>
-                <td>{{ rdv.statut }}</td>
-                <td>
-                    {% if rdv.statut == 'confirme' or rdv.statut == 'CONFIRME' %}
-                        <span class="badge bg-success">Confirmé</span>
-                    {% elif rdv.statut == 'en_attente' or rdv.statut == 'EN_ATTENTE' %}
-                        <span class="badge bg-warning">En attente</span>
-                    {% elif rdv.statut == 'annule' or rdv.statut == 'ANNULE' %}
-                        <span class="badge bg-danger">Annulé</span>
-                    {% else %}
-                        <span class="badge bg-secondary">{{ rdv.statut }}</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <div class="btn-group">
-                        <a href="{% url 'edit_rdv' rdv.id %}" class="btn btn-sm btn-info">Modifier</a>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">Aucun rendez-vous trouvé.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-     <!-- Débogage: Afficher toutes les clés de contexte disponibles -->
-     <div class="mt-5">
-        <h4>Variables de contexte disponibles:</h4>
-        <ul>
-            {% for key, value in request.context.items %}
-            <li>{{ key }}: {{ value|truncatechars:100 }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-    <!-- Section de débogage pour voir les données récupérées -->
-    {% if debug_data %}
-    <div class="mt-5">
-        <h4>Données brutes récupérées (débogage):</h4>
-        <pre>{{ debug_data|pprint }}</pre>
-    </div>
-    {% endif %}
-</div>
+            <div class="appointments">
+                <div class="section-header">
+                    <h3>Rendez-vous à venir ({{ total_count }})</h3>
+                    <a href="{% url 'rdv' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau RDV</a>
+                </div>
+               
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Date & Heure</th>
+                            <th>Type</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rdv in rendezvous_list %}
+                        <tr>
+                            <td>{{ rdv.id }}</td>
+                            <td>
+                                {% if rdv.user %}
+                                    {{ rdv.user.username }}  <!-- ou nom et prénom si disponibles -->
+                                {% else %}
+                                    Non assigné
+                                {% endif %}
+                            </td>
+                            <td>{{ rdv.date_heure }}</td>
+                            <td>{{ rdv.type }}</td>
+                            <td>
+                                {% if rdv.statut == 'Confirmé' %}
+                                    <span class="badge bg-success text-white">Confirmé</span>
+                                {% elif rdv.statut == 'En attente' %}
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                {% elif rdv.statut == 'Annulé' %}
+                                    <span class="badge bg-danger text-white">Annulé</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ rdv.statut }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if rdv.statut == 'Confirmé' %}
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="fas fa-play"></i> Démarrer
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                {% elif rdv.statut == 'En attente' %}
+                                    <button class="btn btn-primary btn-sm">
+                                        <i class="fas fa-check"></i> Confirmer
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                {% elif rdv.statut == 'Annulé' %}
+                                    <button class="btn btn-info btn-sm">
+                                        <i class="fas fa-sync"></i> Reprogrammer
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-success btn-sm">
+                                        <i class="fas fa-box-archive"></i>
+                                    </button>
+                                {% else %}
+                                    <!-- <a href="#" class="btn btn-sm btn-primary">Voir</a>
+                                    <a href="#" class="btn btn-sm btn-warning">Modifier</a> -->
+                                    <a href="{% url 'video_consultation' rdv.id %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-video"></i> Démarrer
+                                    </a>
+                                    <a href="{% url 'edit_rdv' rdv.id %}" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'cancel_rdv' rdv.id %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun rendez-vous disponible</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             
             <div class="patient-list">
                 <div class="section-header">

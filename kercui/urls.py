@@ -16,11 +16,10 @@ urlpatterns = [
     path('medecin/', views.medecin_view, name='medecin'),
     path('password_reset/', views.password_reset, name='password_reset'),
     path('rdv/', views.creer_rendez_vous, name='rdv'),
-
+    path('medecin/', views.liste_rendezvous, name='medecin'),
+    path('video/<int:id>/', views.video_consultation, name='video_consultation'),
     
-     path('rdv/edit/<int:rdv_id>/', views.edit_rdv, name='edit_rdv'),
+    path('rdv/edit/<int:rdv_id>/', views.edit_rdv, name='edit_rdv'),
     path('rdv/cancel/<int:rdv_id>/', views.cancel_rdv, name='cancel_rdv'),
-    path('rdv/confirm/<int:rdv_id>/', views.confirm_rdv, name='confirm_rdv'),
     path('rdv/reschedule/<int:rdv_id>/', views.reschedule_rdv, name='reschedule_rdv'),
-    path('rdv/archive/<int:rdv_id>/', views.archive_rdv, name='archive_rdv'),
 ]

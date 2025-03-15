@@ -17,9 +17,15 @@ from django.http import JsonResponse
 from kercui.models import ProfessionnelSante
 from kercui.form import RendezVousForm
 from django.contrib.auth.decorators import login_required
+from django.db import connection
+from .models import RendezVous
+from django.shortcuts import get_object_or_404
 
 
-logger = logging.getLogger(__name__)
+
+
+
+
 def home(request):
     return render(request, 'kercui/home.html')
 
@@ -157,8 +163,13 @@ def form_prof(request):
 def medecin_view(request):
     if not request.user.is_authenticated and not request.session.get('is_authenticated'):
         return redirect('connexion') 
-    return render(request, 'kercui/medecin.html')  
-
+    rendezvous = RendezVous.objects.all()
+    context = {
+        'debug_data': rendezvous,
+        'model_fields': [field.name for field in RendezVous._meta.get_fields()],
+        'rendezvous_list': rendezvous
+    }
+    return render(request, 'kercui/medecin.html', context)  
 
 def mes_rendez_vous(request):
     rendez_vous = RendezVous.objects.filter(patient=request.user).order_by('date_heure')
@@ -166,10 +177,7 @@ def mes_rendez_vous(request):
 
 @login_required
 def creer_rendez_vous(request):
-   
     users = User.objects.all()
-    
-   
     print("Users with emails:", [(user.id, user.email) for user in users])
     
     if request.method == 'POST':
@@ -211,83 +219,64 @@ def annuler_rendez_vous(request, rdv_id):
     
     return redirect('mes_rendez_vous')     
 
+
 @login_required
 def liste_rendezvous(request):
-    """Vue ultra-simplifiée pour afficher les rendez-vous"""
-    
+    """Vue pour afficher les rendez-vous directement depuis la table"""
+    from django.db import connection
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM kercui_rendezvous")
         columns = [col[0] for col in cursor.description]
-        rendezvous = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        rendezvous_raw = [dict(zip(columns, row)) for row in cursor.fetchall()]
     
-    user_names = {}
-    if rendezvous:
-        user_ids = [rdv['user_id'] for rdv in rendezvous if 'user_id' in rdv]
-        if user_ids:
-            with connection.cursor() as cursor:
-                placeholders = ','.join(['%s'] * len(user_ids))
-                cursor.execute(
-                    f"SELECT id, first_name, last_name FROM auth_user WHERE id IN ({placeholders})",
-                    user_ids
-                )
-                for user_id, first_name, last_name in cursor.fetchall():
-                    user_names[user_id] = f"{last_name} {first_name}"
+    user_ids = [rdv['user_id'] for rdv in rendezvous_raw if rdv['user_id']]
     
-   
-    for rdv in rendezvous:
-        if 'user_id' in rdv and rdv['user_id'] in user_names:
-            rdv['patient_name'] = user_names[rdv['user_id']]
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    users = {user.id: user for user in User.objects.filter(id__in=user_ids)}
+    
+    for rdv in rendezvous_raw:
+        user_id = rdv.get('user_id')
+        if user_id and user_id in users:
+            user = users[user_id]
+            rdv['patient_name'] = f"{user.first_name} {user.last_name}" if user.first_name else f"Utilisateur {user.id}"
         else:
-            rdv['patient_name'] = f"Utilisateur {rdv.get('user_id', 'inconnu')}"
-    
-    
-    print(f"Rendez-vous récupérés: {len(rendezvous)}")
-    for rdv in rendezvous[:2]:  
-        print(rdv)
+            rdv['patient_name'] = "Non assigné"
     
     context = {
-        'rendezvous': rendezvous,
-        'total_count': len(rendezvous)
+        'rendezvous': rendezvous_raw,
+        'total_count': len(rendezvous_raw),
+        'patients': User.objects.all(),
+        'debug_data': rendezvous_raw 
     }
     return render(request, 'kercui/medecin.html', context)
-
-
-@login_required
-def add_rendezvous(request):
-    """Vue pour ajouter un nouveau rendez-vous"""
-    if request.method == 'POST':
-        form = RendezVousForm(request.POST)
-        if form.is_valid():
-            rdv = form.save(commit=False)
-            rdv.user = request.user
-            rdv.save()
-            messages.success(request, "Le rendez-vous a été créé avec succès!")
-            return redirect('rdv')
-    else:
-        form = RendezVousForm()
-    
-    return render(request, 'kercui/rdv.html', {
-        'form': form
-    })
 
 @login_required
 def edit_rdv(request, rdv_id):
     """Vue pour modifier un rendez-vous existant"""
-    rdv = get_object_or_404(RendezVous, id=rdv_id, user=request.user)
+    rdv = get_object_or_404(RendezVous, id=rdv_id)
     
-    if request.method == 'POST':
-        form = RendezVousForm(request.POST, instance=rdv)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Le rendez-vous a été modifié avec succès!")
-            return redirect('rdv')
+    if request.user.is_staff or (rdv.user and rdv.user == request.user):
+        if request.method == 'POST':
+            form = RendezVousForm(request.POST, instance=rdv)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Le rendez-vous a été modifié avec succès!")
+                return redirect('rdv') 
+        else:
+            form = RendezVousForm(instance=rdv)
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        users = User.objects.all()
+        
+        return render(request, 'kercui/modifier_rendezvous.html', {
+            'form': form,
+            'rdv': rdv,
+            'users': users
+        })
     else:
-        form = RendezVousForm(instance=rdv)
-    
-    return render(request, 'kercui/modifier_rendezvous.html', {
-        'form': form,
-        'rdv': rdv
-    })
+        messages.error(request, "Vous n'avez pas l'autorisation de modifier ce rendez-vous.")
+        return redirect('rdv') 
 
 @login_required
 def cancel_rdv(request, rdv_id):
@@ -295,25 +284,15 @@ def cancel_rdv(request, rdv_id):
     rdv = get_object_or_404(RendezVous, id=rdv_id, user=request.user)
     
     if request.method == 'POST':
-        rdv.statut = 'annule'  # Utilisez la valeur correspondant à votre modèle
+        rdv.statut = 'Annulé'  
         rdv.save()
         messages.success(request, "Le rendez-vous a été annulé avec succès!")
-        return redirect('rdv')
+        return redirect('medecin')
     else:
         return render(request, 'kercui/confirmer_annulation.html', {
             'rdv': rdv
         })
 
-@login_required
-def confirm_rdv(request, rdv_id):
-    """Vue pour confirmer un rendez-vous en attente"""
-    rdv = get_object_or_404(RendezVous, id=rdv_id, user=request.user, statut='en_attente')
-    
-    rdv.statut = 'confirme' 
-    rdv.save()
-    messages.success(request, "Le rendez-vous a été confirmé avec succès!")
-    
-    return redirect('rdv')
 
 @login_required
 def reschedule_rdv(request, rdv_id):
@@ -342,18 +321,7 @@ def reschedule_rdv(request, rdv_id):
         messages.error(request, "Vous n'avez pas l'autorisation d'accéder à cette page.")
         return redirect('medecin')
 
-@login_required
-def archive_rdv(request, rdv_id):
-    """Vue pour archiver un rendez-vous annulé"""
-    try:
-        professionnel = ProfessionnelSante.objects.get(user=request.user)
-        rdv = get_object_or_404(RendezVous, id=rdv_id, professionnel=professionnel, statut='ANNULÉ')
-        
-        rdv.est_archive = True
-        rdv.save()
-        
-        messages.success(request, "Le rendez-vous a été archivé avec succès!")
-        return redirect('rdv')
-    except ProfessionnelSante.DoesNotExist:
-        messages.error(request, "Vous n'avez pas l'autorisation d'accéder à cette page.")
-        return redirect('dashboard')
+def video_consultation(request, id):
+    from .models import VideoConsultation
+    consultation = get_object_or_404(VideoConsultation, id=id)
+    return render(request, 'kercui/video_consultation.html', {"rdv_id": rdv_id})

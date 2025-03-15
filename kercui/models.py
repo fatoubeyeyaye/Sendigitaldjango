@@ -60,8 +60,6 @@ class ProfessionnelSante(models.Model):
     class Meta:
         db_table = 'kercui_professionnelsante'
 
-from django.db import models
-from django.contrib.auth.models import User
 
 class RendezVous(models.Model):
     """
@@ -79,16 +77,15 @@ class RendezVous(models.Model):
         ('Première consultation', 'Première consultation'),
         ('Consultation en cabinet', 'Consultation en cabinet'),
     ]
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rendez_vous_patient')
-    date_heure = models.DateTimeField() 
+    date_heure = models.DateTimeField()
     type = models.CharField(max_length=100, choices=TYPE_CHOICES)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='EN_ATTENTE')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
     def __str__(self):
-        return f"RDV: {self.patient} - {self.date_heure.strftime('%d/%m/%Y %H:%M')}"
+        return f"RDV: {self.user.first_name} {self.user.last_name} - {self.date_heure.strftime('%d/%m/%Y %H:%M')}"
    
     class Meta:
         verbose_name = "Rendez-vous"
